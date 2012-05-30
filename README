@@ -1,0 +1,193 @@
+----- Description
+
+We have video timeline control which represents list of video frames.
+Timeline consists of 3 moving parts:
+- slider
+- left part
+- right part
+
+
+
+----- Init
+
+Call this method to init control:
+- (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileUrl;
+fileUrl - url to the local storage video file
+
+
+
+----- Supported Orientations
+
+Portrait and Landscape orientations are supported.
+
+Call this method inside didRotateFromInterfaceOrientation method of ViewController
+- (void)reloadTimelineInCurrentInterfaceOrientation;
+
+
+
+----- Manipulation
+We have ability to manipulate behavior of control via 3 properties:
+
+1)
+@property (nonatomic, assign) BOOL editing;
+Set left and right parts moved or unmoved.
+
+When you moving left or right part of control and part go to the next thumbnail on timeline this methods will be called:
+- (void) timelineControl:(TimelineControl *)control startThumbnailChanged:(CMTime)time;		// for left part
+- (void) timelineControl:(TimelineControl *)control endThumbnailChanged:(CMTime)time;		// for right part
+
+When you stop moving left or right part of the control and hold on finger on the timeline, this methods will be called.
+- (void) timelineControl:(TimelineControl *)control startHovered:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control endHovered:(CMTime)time;
+
+2)
+@property (nonatomic, assign) BOOL sliderHidden;
+This set slider hidden.
+
+If NO: this methods will be called:
+- (void) timelineControl:(TimelineControl *)control sliderThumbnailChanged:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control sliderHovered:(CMTime)time;
+
+3)
+@property (nonatomic, assign) NSTimeInterval touchedDelayToGenerateNewFrame;
+Value of this property influent on time when this methods will be called:
+- (void) timelineControl:(TimelineControl *)control sliderHovered:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control startHovered:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control endHovered:(CMTime)time;
+
+
+
+----- Delegate
+
+To receive information about interaction with control need set delegate value and realize it methods:
+
+@property (nonatomic, assign) id<TimelineControlDelegate> delegate;
+
+// moving through thumbnails
+- (void) timelineControl:(TimelineControl *)control sliderThumbnailChanged:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control startThumbnailChanged:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control endThumbnailChanged:(CMTime)time;
+
+// end of moving
+- (void) timelineControl:(TimelineControl *)control sliderMovingEnded:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control startMovingEnded:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control endMovingEnded:(CMTime)time;
+
+// hovering
+- (void) timelineControl:(TimelineControl *)control sliderHovered:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control startHovered:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control endHovered:(CMTime)time;
+
+
+
+----- Gettin times of moved parts
+
+- (CMTime)timelineSliderTime;     // slider time
+- (CMTime)timelineStartTime;    // start time
+- (CMTime)timelineEndTime;      // end time
+
+
+
+----- Getting images
+
+Recommended use synchronous methods, when you need get only one image.
+Not recommended use in real time image extraction synchronous methods.
+// synchronously
+- (UIImage *)imageForTime:(CMTime)time;
+- (UIImage *)imageForTime:(CMTime)time size:(CGSize)size;
+- (UIImage *)imageForTime:(CMTime)time width:(NSInteger)width;
+- (UIImage *)imageForTime:(CMTime)time height:(NSInteger)height;
+
+// If you need request images very often and need only last result use asynchronous methods.
+// asynchronously
+- (void)imageForTime:(CMTime)time completionHandler:(void(^)(UIImage *image))completionHandler;
+- (void)imageForTime:(CMTime)time size:(CGSize)size completionHandler:(void(^)(UIImage *image))completionHandler;
+- (void)imageForTime:(CMTime)time width:(NSInteger)width completionHandler:(void(^)(UIImage *image))completionHandler;
+- (void)imageForTime:(CMTime)time height:(NSInteger)height completionHandler:(void(^)(UIImage *image))completionHandler;
+
+Every asynchronous method call stops previously asynchronous calls.
+
+
+----- Examples
+
+1) 
+- (id)init {
+    self = [super init];
+    if (self) {
+        NSString *filepath = [[NSBundle mainBundle] pathForResource:@"aaa" ofType:@"MOV"];
+        NSURL *fileURL = [NSURL fileURLWithPath:filepath];
+        _timelineControl = [[TimelineControl alloc] initWithFrame:CGRectMake(0, 0, 320, 60) fileURL:fileURL];
+        [_timelineControl setDelegate:self];
+    }
+    return self;
+}
+
+- (void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    [_timelineControl reloadTimelineInCurrentInterfaceOrientation];
+}
+
+
+
+// delegate methods
+
+- (void) timelineControl:(TimelineControl *)control sliderThumbnailChanged:(CMTime)time {
+    int width = CGRectGetWidth(_imageView.frame) * 2;
+    [_timelineControl imageForTime:time width:width completionHandler:^(UIImage *image) {
+        [_imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+    }];
+}
+
+- (void) timelineControl:(TimelineControl *)control startThumbnailChanged:(CMTime)time {
+
+}
+
+- (void) timelineControl:(TimelineControl *)control endThumbnailChanged:(CMTime)time {
+
+}
+
+- (void) timelineControl:(TimelineControl *)control sliderMovingEnded:(CMTime)time {
+    int width = CGRectGetWidth(_imageView.frame);
+    [_timelineControl imageForTime:time width:width completionHandler:^(UIImage *image) {
+        [_imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+    }];
+}
+
+- (void) timelineControl:(TimelineControl *)control startMovingEnded:(CMTime)time {
+    int width = CGRectGetWidth(_imageView.frame);
+    [_timelineControl imageForTime:[_timelineControl timelineSliderTime] width:width completionHandler:^(UIImage *image) {
+        [_imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+    }];
+}
+
+- (void) timelineControl:(TimelineControl *)control endMovingEnded:(CMTime)time {
+    int width = CGRectGetWidth(_imageView.frame);
+    [_timelineControl imageForTime:[_timelineControl timelineSliderTime] width:width completionHandler:^(UIImage *image) {
+        [_imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+    }];    
+}
+
+
+- (void) timelineControl:(TimelineControl *)control sliderHovered:(CMTime)time {
+    int width = CGRectGetWidth(_imageView.frame);
+    [_timelineControl imageForTime:time width:width completionHandler:^(UIImage *image) {
+        [_imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+    }];
+}
+
+- (void) timelineControl:(TimelineControl *)control startHovered:(CMTime)time {
+    int width = CGRectGetWidth(_imageView.frame);
+    [_timelineControl imageForTime:time width:width completionHandler:^(UIImage *image) {
+        [_imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+    }];
+}
+
+- (void) timelineControl:(TimelineControl *)control endHovered:(CMTime)time {
+    int width = CGRectGetWidth(_imageView.frame);
+    [_timelineControl imageForTime:time width:width completionHandler:^(UIImage *image) {
+        [_imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+    }];
+}
+
+
+
