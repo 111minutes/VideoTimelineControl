@@ -10,9 +10,15 @@
 #import <UIKit/UIKit.h>
 #import "TimelineControlDelegate.h"
 
+
+#define TimelinePlaceholderKey @"TimelinePlaceholderKey"
+#define TimelineTrimViewKey @"TimelineTrimViewKey"
+#define TimelineSliderKey @"TimelineSliderKey"
+
 @interface TimelineControl : UIView
 
-- (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileUrl;
+- (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileUrl imagesDictionary:(NSDictionary*)imagesDictionary;
+- (id)initWithFrame:(CGRect)frame imagesDictionary:(NSDictionary*)imagesDictionary;
 - (void)reloadTimelineInCurrentInterfaceOrientation;        //must be call inside didRotateFromInterfaceOrientation 
 
 - (CMTime)timelineSliderTime;     // slider time
