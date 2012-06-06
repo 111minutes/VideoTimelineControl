@@ -89,7 +89,7 @@ typedef enum {
 
 @synthesize editing = _editing;
 @synthesize sliderHidden = _sliderHidden;
-@synthesize delegate = _delegate;
+@synthesize delegate;
 @synthesize touchedDelayToGenerateNewFrame = _touchedDelayToGenerateNewFrame;
 
 #pragma makr Properties
@@ -176,89 +176,81 @@ typedef enum {
 - (id)initWithFrame:(CGRect)frame imagesDictionary:(NSDictionary*)imagesDictionary{
     self = [super initWithFrame:frame];
     if (self) {      
+        UIImage *timelinePlaceholderImage = nil;
+        UIImage *trimViewImage = nil;
+        UIImage *timelineSliderImage = nil;
         
-        @autoreleasepool {
-            UIImage *timelinePlaceholderImage = nil;
-            UIImage *trimViewImage = nil;
-            UIImage *timelineSliderImage = nil;
-            
-            
-            if(imagesDictionary){
-                timelinePlaceholderImage = (UIImage*)[imagesDictionary objectForKey:TimelinePlaceholderKey];
-                trimViewImage = (UIImage*)[imagesDictionary objectForKey:TimelineTrimViewKey];
-                timelineSliderImage = (UIImage*)[imagesDictionary objectForKey:TimelineSliderKey];
-            }
-            else{
-                timelinePlaceholderImage = [UIImage imageNamed:@"timelinePlaceholder.png"];
-                trimViewImage = [UIImage imageNamed:@"trimView.png"];
-                timelineSliderImage = [UIImage imageNamed:@"TimelineSlider.png"];
-            }
-            
-            
-            self.multipleTouchEnabled = NO;
-            self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-            
-            NSInteger width = CGRectGetWidth(self.frame);
-            NSInteger height = CGRectGetHeight(self.frame);
-            
-            // backgroun view
-            _backgroundImageView = [[UIImageView alloc] initWithFrame:self.bounds];
-            [_backgroundImageView setBackgroundColor:[UIColor blackColor]];
-            [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-            [self addSubview:_backgroundImageView];
-            
-            // timeline view
-            UIImage *timeLineBGImage = timelinePlaceholderImage;
-            timeLineBGImage = [timeLineBGImage stretchableImageWithLeftCapWidth:timeLineBGImage.size.width/2 topCapHeight:timeLineBGImage.size.height/2];
-            _timelineBackgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * timelineLeft, timelineHeight)];
-            [_timelineBackgroundImageView setCenter:CGPointMake(width/2, height/2)];
-            [_timelineBackgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-            [_timelineBackgroundImageView setImage:timeLineBGImage];
-            [self addSubview:_timelineBackgroundImageView];
-
-            // trim view
-            
-//            UIEdgeInsets imgInsets = UIEdgeInsetsMake(26.f, 15.f, 26.f, 15.f);
-//            
-//            trimViewImage = [trimViewImage resizableImageWithCapInsets:imgInsets];
-            
-            trimViewImage = [trimViewImage stretchableImageWithLeftCapWidth:17
-                                                       topCapHeight:trimViewImage.size.height/2];
-            
-            _trimTimelineView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * trimViewLeft, trimViewHeight)];
-            [_trimTimelineView setBackgroundColor:[UIColor clearColor]];
-            [_trimTimelineView setCenter:CGPointMake(width/2, height/2)];
-            [_trimTimelineView setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin |
-             UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth];
-            
-            UIImageView *trimImageView = [[UIImageView alloc] initWithFrame:_trimTimelineView.bounds];
-            [trimImageView setContentMode:UIViewContentModeScaleAspectFit];
-            [trimImageView setImage:trimViewImage];
-            [trimImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth |
-             UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth];
-            [_trimTimelineView addSubview:trimImageView];
-            [self addSubview:_trimTimelineView];
-            
-            // slider
-            _slider = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, sliderWidth, sliderHeight)];
-            [_slider setImage:timelineSliderImage];
-            [_slider setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin];
-            [_slider setCenter:CGPointMake(0, height/2)];
-            [self setSliderCorrectPosition];
-            
-            [self addSubview:_slider];
-            
-            //overlapped
-            float alpha = 0.5;
-            
-            _leftOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, timelineHeight)];
-            [_leftOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
-            [_timelineBackgroundImageView addSubview:_leftOverlappedImageView];
-            
-            _rightOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(width-timelineLeft, 0, 0, timelineHeight)];
-            [_rightOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
-            [_timelineBackgroundImageView addSubview:_rightOverlappedImageView];
+        
+        if(imagesDictionary){
+            timelinePlaceholderImage = (UIImage*)[imagesDictionary objectForKey:TimelinePlaceholderKey];
+            trimViewImage = (UIImage*)[imagesDictionary objectForKey:TimelineTrimViewKey];
+            timelineSliderImage = (UIImage*)[imagesDictionary objectForKey:TimelineSliderKey];
         }
+        else{
+            timelinePlaceholderImage = [UIImage imageNamed:@"timelinePlaceholder.png"];
+            trimViewImage = [UIImage imageNamed:@"trimView.png"];
+            timelineSliderImage = [UIImage imageNamed:@"TimelineSlider.png"];
+        }
+        
+        
+        self.multipleTouchEnabled = NO;
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        
+        NSInteger width = CGRectGetWidth(self.frame);
+        NSInteger height = CGRectGetHeight(self.frame);
+        
+        // backgroun view
+        _backgroundImageView = [[UIImageView alloc] initWithFrame:self.bounds];
+        [_backgroundImageView setBackgroundColor:[UIColor blackColor]];
+        [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self addSubview:_backgroundImageView];
+        
+        // timeline view
+        UIImage *timeLineBGImage = timelinePlaceholderImage;
+        timeLineBGImage = [timeLineBGImage stretchableImageWithLeftCapWidth:timeLineBGImage.size.width/2 topCapHeight:timeLineBGImage.size.height/2];
+        _timelineBackgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * timelineLeft, timelineHeight)];
+        [_timelineBackgroundImageView setCenter:CGPointMake(width/2, height/2)];
+        [_timelineBackgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_timelineBackgroundImageView setImage:timeLineBGImage];
+        [self addSubview:_timelineBackgroundImageView];
+
+        // trim view
+        
+        trimViewImage = [trimViewImage stretchableImageWithLeftCapWidth:trimViewImage.size.width/2
+                                                           topCapHeight:trimViewImage.size.height/2];
+        
+        _trimTimelineView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * trimViewLeft, trimViewHeight)];
+        [_trimTimelineView setBackgroundColor:[UIColor clearColor]];
+        [_trimTimelineView setCenter:CGPointMake(width/2, height/2)];
+        [_trimTimelineView setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin |
+         UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth];
+        
+        UIImageView *trimImageView = [[UIImageView alloc] initWithFrame:_trimTimelineView.bounds];
+//            [trimImageView setContentMode:UIViewContentModeScaleAspectFit];
+        [trimImageView setImage:trimViewImage];
+        [trimImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_trimTimelineView addSubview:trimImageView];
+        [self addSubview:_trimTimelineView];
+        
+        // slider
+        _slider = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, sliderWidth, sliderHeight)];
+        [_slider setImage:timelineSliderImage];
+        [_slider setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin];
+        [_slider setCenter:CGPointMake(0, height/2)];
+        [self setSliderCorrectPosition];
+        
+        [self addSubview:_slider];
+        
+        //overlapped
+        float alpha = 0.5;
+        
+        _leftOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, timelineHeight)];
+        [_leftOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
+        [_timelineBackgroundImageView addSubview:_leftOverlappedImageView];
+        
+        _rightOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(width-timelineLeft, 0, 0, timelineHeight)];
+        [_rightOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
+        [_timelineBackgroundImageView addSubview:_rightOverlappedImageView];
     }
     return self;
 }
@@ -463,18 +455,18 @@ typedef enum {
     
     switch (_currentMovingElement) {
         case MovingElementLeftBorder:
-            if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:startMovingEnded:)]) {
-                [_delegate timelineControl:self startMovingEnded:[self timelineStartTime]];
+            if (delegate && [delegate respondsToSelector:@selector(timelineControl:startMovingEnded:)]) {
+                [delegate timelineControl:self startMovingEnded:[self timelineStartTime]];
             }
             break;
         case MovingElementRightBorder:
-            if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:endMovingEnded:)]) {
-                [_delegate timelineControl:self endMovingEnded:[self timelineEndTime]];
+            if (delegate && [delegate respondsToSelector:@selector(timelineControl:endMovingEnded:)]) {
+                [delegate timelineControl:self endMovingEnded:[self timelineEndTime]];
             }
             break;
         case MovingElementSlider:
-            if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:sliderMovingEnded:)]) {
-                [_delegate timelineControl:self sliderMovingEnded:[self timelineSliderTime]];
+            if (delegate && [delegate respondsToSelector:@selector(timelineControl:sliderMovingEnded:)]) {
+                [delegate timelineControl:self sliderMovingEnded:[self timelineSliderTime]];
             }
             break;
         case MovingElementNone:
@@ -880,8 +872,8 @@ typedef enum {
     int thumbWidth = [self thumbnailImageViewWidthInCurrentOrientation];
     int  thumbnailNumber = position / thumbWidth;
     if (thumbnailNumber != _prevThumbnailNumber) {
-        if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:sliderThumbnailChanged:)]) {
-            [_delegate timelineControl:self sliderThumbnailChanged:[self timelineSliderTime]];
+        if (delegate && [delegate respondsToSelector:@selector(timelineControl:sliderThumbnailChanged:)]) {
+            [delegate timelineControl:self sliderThumbnailChanged:[self timelineSliderTime]];
         }
         _prevThumbnailNumber = thumbnailNumber;
     }
@@ -894,8 +886,8 @@ typedef enum {
     int thumbWidth = [self thumbnailImageViewWidthInCurrentOrientation];
     int thumbNumber = left / thumbWidth;
     if (thumbNumber != _prevStartThumbnailNumber) {
-        if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:startThumbnailChanged:)]) {
-            [_delegate timelineControl:self startThumbnailChanged:[self timelineStartTime]];
+        if (delegate && [delegate respondsToSelector:@selector(timelineControl:startThumbnailChanged:)]) {
+            [delegate timelineControl:self startThumbnailChanged:[self timelineStartTime]];
         }
         _prevStartThumbnailNumber = thumbNumber;
     }
@@ -908,8 +900,8 @@ typedef enum {
     int thumbWidth = [self thumbnailImageViewWidthInCurrentOrientation];
     int thumbNumber = (right-thumbWidth) / thumbWidth;
     if (thumbNumber != _prevEndThumbnailNumber) {
-        if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:endThumbnailChanged:)]) {
-            [_delegate timelineControl:self endThumbnailChanged:[self timelineEndTime]];
+        if (delegate && [delegate respondsToSelector:@selector(timelineControl:endThumbnailChanged:)]) {
+            [delegate timelineControl:self endThumbnailChanged:[self timelineEndTime]];
         }
         _prevEndThumbnailNumber = thumbNumber;
     }
@@ -940,22 +932,22 @@ typedef enum {
 #pragma mark Hovering timers
 
 - (void)timerFireMethodSlider:(NSTimer*)theTimer {   
-    if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:sliderHovered:)]) {
-        [_delegate timelineControl:self sliderHovered:[self timelineSliderTime]];
+    if (delegate && [delegate respondsToSelector:@selector(timelineControl:sliderHovered:)]) {
+        [delegate timelineControl:self sliderHovered:[self timelineSliderTime]];
     }
     _timer = nil;
 }
 
 - (void)timerFireMethodStart:(NSTimer*)theTimer {
-    if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:startHovered:)]) {
-        [_delegate timelineControl:self startHovered:[self timelineStartTime]];
+    if (delegate && [delegate respondsToSelector:@selector(timelineControl:startHovered:)]) {
+        [delegate timelineControl:self startHovered:[self timelineStartTime]];
     }
     _timer = nil;
 }
 
 - (void)timerFireMethodEnd:(NSTimer*)theTimer {  
-    if (_delegate && [_delegate respondsToSelector:@selector(timelineControl:endHovered:)]) {
-        [_delegate timelineControl:self endHovered:[self timelineEndTime]];
+    if (delegate && [delegate respondsToSelector:@selector(timelineControl:endHovered:)]) {
+        [delegate timelineControl:self endHovered:[self timelineEndTime]];
     }
     _timer = nil;
 }
