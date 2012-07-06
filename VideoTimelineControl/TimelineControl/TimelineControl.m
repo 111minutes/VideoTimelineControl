@@ -20,7 +20,7 @@ static const int trimViewLeft = 10;
 static const int sliderWidth = 11;
 static const int sliderHeight = 43;
 
-static const int minDistanceBetweenActiveTrimParts = 21;
+static const int minDistanceBetweenActiveTrimParts = 50;
 
 static const int numberThumbnailsPortrait = 10;
 static const int numberThumbnailsLandscape = 20;
@@ -205,6 +205,9 @@ typedef enum {
         [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [self addSubview:_backgroundImageView];
         
+        
+        
+        
         // timeline view
         UIImage *timeLineBGImage = timelinePlaceholderImage;
         timeLineBGImage = [timeLineBGImage stretchableImageWithLeftCapWidth:timeLineBGImage.size.width/2 topCapHeight:timeLineBGImage.size.height/2];
@@ -215,18 +218,13 @@ typedef enum {
         [self addSubview:_timelineBackgroundImageView];
 
         // trim view
-        
         trimViewImage = [trimViewImage stretchableImageWithLeftCapWidth:trimViewImage.size.width/2
                                                            topCapHeight:trimViewImage.size.height/2];
-        
         _trimTimelineView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * trimViewLeft, trimViewHeight)];
         [_trimTimelineView setBackgroundColor:[UIColor clearColor]];
         [_trimTimelineView setCenter:CGPointMake(width/2, height/2)];
-        [_trimTimelineView setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin |
-         UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth];
-        
+        [_trimTimelineView setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth];
         UIImageView *trimImageView = [[UIImageView alloc] initWithFrame:_trimTimelineView.bounds];
-//            [trimImageView setContentMode:UIViewContentModeScaleAspectFit];
         [trimImageView setImage:trimViewImage];
         [trimImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [_trimTimelineView addSubview:trimImageView];
