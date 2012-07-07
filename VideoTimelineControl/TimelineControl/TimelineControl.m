@@ -14,11 +14,11 @@
 static const int timelineHeight = 37;
 static const int timelineLeft = 20;
 
-static const int trimViewHeight = 53;
+static const int trimViewHeight = 58;
 static const int trimViewLeft = 0;
 
 static const int sliderWidth = 11;
-static const int sliderHeight = 43;
+static const int sliderHeight = 47;
 
 static const int minDistanceBetweenActiveTrimParts = 21;
 
@@ -201,8 +201,8 @@ typedef enum {
         
         // backgroun view
         _backgroundImageView = [[UIImageView alloc] initWithFrame:self.bounds];
-        [_backgroundImageView setBackgroundColor:[UIColor blackColor]];
-        [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_backgroundImageView setImage:[UIImage imageNamed:@"edit-timeline-background"]];
+        [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
         [self addSubview:_backgroundImageView];
         
         
@@ -210,7 +210,11 @@ typedef enum {
         
         // timeline view
         UIImage *timeLineBGImage = timelinePlaceholderImage;
-        timeLineBGImage = [timeLineBGImage stretchableImageWithLeftCapWidth:timeLineBGImage.size.width/2 topCapHeight:timeLineBGImage.size.height/2];
+//        timeLineBGImage = [timeLineBGImage stretchableImageWithLeftCapWidth:timeLineBGImage.size.width/2
+//                                                               topCapHeight:timeLineBGImage.size.height/2];
+        
+        timeLineBGImage = [timeLineBGImage resizableImageWithCapInsets:UIEdgeInsetsMake(timeLineBGImage.size.height/2, timeLineBGImage.size.width/2, timeLineBGImage.size.height/2-1, timeLineBGImage.size.width/2-1)];
+        
         _timelineBackgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * timelineLeft, timelineHeight)];
         [_timelineBackgroundImageView setCenter:CGPointMake(width/2, height/2)];
         [_timelineBackgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
@@ -218,8 +222,11 @@ typedef enum {
         [self addSubview:_timelineBackgroundImageView];
 
         // trim view
-        trimViewImage = [trimViewImage stretchableImageWithLeftCapWidth:trimViewImage.size.width/2
-                                                           topCapHeight:trimViewImage.size.height/2];
+//        trimViewImage = [trimViewImage stretchableImageWithLeftCapWidth:trimViewImage.size.width/2
+//                                                           topCapHeight:trimViewImage.size.height/2];
+        
+        trimViewImage = [trimViewImage resizableImageWithCapInsets:UIEdgeInsetsMake(trimViewImage.size.height/2, trimViewImage.size.width/2, trimViewImage.size.height/2-1, trimViewImage.size.width/2-1)];
+        
         _trimTimelineView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * trimViewLeft, trimViewHeight)];
         [_trimTimelineView setBackgroundColor:[UIColor clearColor]];
         [_trimTimelineView setCenter:CGPointMake(width/2, height/2)];
@@ -243,11 +250,11 @@ typedef enum {
         float alpha = 0.5;
         
         _leftOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, timelineHeight)];
-        [_leftOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
+//        [_leftOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
         [_timelineBackgroundImageView addSubview:_leftOverlappedImageView];
         
         _rightOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(width-timelineLeft, 0, 0, timelineHeight)];
-        [_rightOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
+//        [_rightOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
         [_timelineBackgroundImageView addSubview:_rightOverlappedImageView];
     }
     return self;
