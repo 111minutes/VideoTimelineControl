@@ -15,12 +15,12 @@ static const int timelineHeight = 37;
 static const int timelineLeft = 20;
 
 static const int trimViewHeight = 53;
-static const int trimViewLeft = 10;
+static const int trimViewLeft = 0;
 
 static const int sliderWidth = 11;
 static const int sliderHeight = 43;
 
-static const int minDistanceBetweenActiveTrimParts = 50;
+static const int minDistanceBetweenActiveTrimParts = 21;
 
 static const int numberThumbnailsPortrait = 10;
 static const int numberThumbnailsLandscape = 20;
