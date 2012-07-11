@@ -14,6 +14,10 @@
 @protocol TimelineControlDelegate <NSObject>
 
 @optional
+
+//moved
+- (void) timelineControl:(TimelineControl *)control sliderMoved:(CMTime)time;
+
 // moving through thumbnails
 - (void) timelineControl:(TimelineControl *)control sliderThumbnailChanged:(CMTime)time;
 - (void) timelineControl:(TimelineControl *)control startThumbnailChanged:(CMTime)time;
