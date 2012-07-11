@@ -696,6 +696,11 @@ typedef enum {
 }
 
 - (void)setTimelineSliderTime:(CMTime)time {
+    
+    if(_currentMovingElement == MovingElementSlider){
+        return;
+    }
+    
     NSInteger position = [self getTimelinePositionForTime:time];
     [_slider setCenter:CGPointMake(timelineLeft + position, _slider.center.y)];
 
@@ -882,6 +887,9 @@ typedef enum {
         }
         _prevThumbnailNumber = thumbnailNumber;
     }
+    if(delegate && [delegate respondsToSelector:@selector(timelineControl:sliderMoved:)]){
+        [delegate timelineControl:self sliderMoved:[self timelineSliderTime]];
+    }
 }
 
 - (void) checkStartPositionThumbnailChanged {
@@ -960,25 +968,3 @@ typedef enum {
 
 
 @end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
