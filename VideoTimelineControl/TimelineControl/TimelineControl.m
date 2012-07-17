@@ -11,7 +11,7 @@
 #import <CoreMedia/CoreMedia.h>
 #import <CoreVideo/CoreVideo.h>
 
-static const int timelineHeight = 37;
+static const int timelineHeight = 36;
 static const int timelineLeft = 20;
 
 static const int trimViewHeight = 58;
