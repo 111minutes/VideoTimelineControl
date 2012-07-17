@@ -249,11 +249,11 @@ typedef enum {
         //overlapped
         float alpha = 0.5;
         
-        _leftOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, trimViewHeight)];
+        _leftOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 5, trimViewHeight)];
         [_leftOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
         [_timelineBackgroundImageView addSubview:_leftOverlappedImageView];
         
-        _rightOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(width-timelineLeft, 0, 0, trimViewHeight)];
+        _rightOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(width-timelineLeft-5, 0, 0, trimViewHeight)];
         [_rightOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
         [_timelineBackgroundImageView addSubview:_rightOverlappedImageView];
     }
