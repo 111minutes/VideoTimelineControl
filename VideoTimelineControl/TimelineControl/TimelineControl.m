@@ -216,7 +216,7 @@ typedef enum {
         timeLineBGImage = [timeLineBGImage resizableImageWithCapInsets:UIEdgeInsetsMake(timeLineBGImage.size.height/2, timeLineBGImage.size.width/2, timeLineBGImage.size.height/2-1, timeLineBGImage.size.width/2-1)];
         
         _timelineBackgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, width - 2 * timelineLeft, timelineHeight)];
-        [_timelineBackgroundImageView setCenter:CGPointMake(width/2, height/2-3)];
+        [_timelineBackgroundImageView setCenter:CGPointMake(width/2, height/2-1)];
         [_timelineBackgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [_timelineBackgroundImageView setImage:timeLineBGImage];
         [self addSubview:_timelineBackgroundImageView];
