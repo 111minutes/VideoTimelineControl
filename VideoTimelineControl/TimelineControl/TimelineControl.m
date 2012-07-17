@@ -504,7 +504,7 @@ typedef enum {
     _prevLocationInCurentMovingElement = point;
     _currentMovingElement = MovingElementNone;
     
-    int expandDx = 5;
+    int expandDx = 25;
     
     if (!self.sliderHidden) {
         CGRect sliderFrame = _slider.frame;
