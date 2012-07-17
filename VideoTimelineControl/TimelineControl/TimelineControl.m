@@ -614,7 +614,7 @@ typedef enum {
 
 - (void)setRightOverlappedViewCorrectPosition {
     int left = MIN(CGRectGetMaxX(_trimTimelineView.frame), CGRectGetWidth(self.frame)-timelineLeft) - timelineLeft;
-    [_rightOverlappedImageView setFrame:CGRectMake(left, 0, CGRectGetWidth(self.frame)-left-timelineLeft, timelineHeight)];
+    [_rightOverlappedImageView setFrame:CGRectMake(left, 0, CGRectGetWidth(self.frame)-left-timelineLeft - _timelineBackgroundImageView.frame.origin.x, timelineHeight)];
 }
 
 - (void)setSliderCorrectPosition {
