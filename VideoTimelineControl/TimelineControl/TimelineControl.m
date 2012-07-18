@@ -14,7 +14,7 @@
 static const int timelineHeight = 36;
 static const int timelineLeft = 20;
 
-static const int trimViewHeight = 58;
+static const int trimViewHeight = 56;
 static const int trimViewLeft = 0;
 
 static const int sliderWidth = 11;
@@ -200,18 +200,15 @@ typedef enum {
         NSInteger height = CGRectGetHeight(self.frame);
         
         // backgroun view
-        _backgroundImageView = [[UIImageView alloc] initWithFrame:self.bounds];
+        _backgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height - 3)];
         [_backgroundImageView setImage:[UIImage imageNamed:@"edit-timeline-background"]];
-        [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+        [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_backgroundImageView setContentMode:UIViewContentModeScaleToFill];
         [self addSubview:_backgroundImageView];
-        
-        
         
         
         // timeline view
         UIImage *timeLineBGImage = timelinePlaceholderImage;
-//        timeLineBGImage = [timeLineBGImage stretchableImageWithLeftCapWidth:timeLineBGImage.size.width/2
-//                                                               topCapHeight:timeLineBGImage.size.height/2];
         
         timeLineBGImage = [timeLineBGImage resizableImageWithCapInsets:UIEdgeInsetsMake(timeLineBGImage.size.height/2, timeLineBGImage.size.width/2, timeLineBGImage.size.height/2-1, timeLineBGImage.size.width/2-1)];
         
@@ -222,8 +219,6 @@ typedef enum {
         [self addSubview:_timelineBackgroundImageView];
 
         // trim view
-//        trimViewImage = [trimViewImage stretchableImageWithLeftCapWidth:trimViewImage.size.width/2
-//                                                           topCapHeight:trimViewImage.size.height/2];
         
         trimViewImage = [trimViewImage resizableImageWithCapInsets:UIEdgeInsetsMake(trimViewImage.size.height/2, trimViewImage.size.width/2, trimViewImage.size.height/2-1, trimViewImage.size.width/2-1)];
         
@@ -303,6 +298,9 @@ typedef enum {
         [thumbnailImageView setTag:i + 100];
         [_timelineBackgroundImageView addSubview:thumbnailImageView];
     }
+    [_rightOverlappedImageView removeFromSuperview];
+    [_leftOverlappedImageView removeFromSuperview];
+    
     [_timelineBackgroundImageView insertSubview:_leftOverlappedImageView atIndex:100];
     [_timelineBackgroundImageView insertSubview:_rightOverlappedImageView atIndex:100];
     
