@@ -415,7 +415,6 @@ typedef enum {
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-    
     [_timer invalidate];
     _timer = nil;
     
@@ -473,6 +472,14 @@ typedef enum {
             }
             break;
         case MovingElementNone:
+            if (delegate && [delegate respondsToSelector:@selector(timelineControl:sliderTapped:)]) {
+                UITouch *touch = [touches anyObject];
+                CGPoint point = [touch locationInView:self];
+                CMTime time = [self getTimelineTimeFromPosition:point.x];
+                [self setTimelineSliderTime:time];
+                _timer = [NSTimer scheduledTimerWithTimeInterval:self.touchedDelayToGenerateNewFrame target:self selector:@selector(timerFireMethodSlider:) userInfo:nil repeats:NO];
+                [delegate timelineControl:self sliderTapped:time];
+            }
             break;
     }
     

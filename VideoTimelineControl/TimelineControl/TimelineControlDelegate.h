@@ -17,6 +17,7 @@
 
 //moved
 - (void) timelineControl:(TimelineControl *)control sliderMoved:(CMTime)time;
+- (void) timelineControl:(TimelineControl *)control sliderTapped:(CMTime)time;
 
 // moving through thumbnails
 - (void) timelineControl:(TimelineControl *)control sliderThumbnailChanged:(CMTime)time;
