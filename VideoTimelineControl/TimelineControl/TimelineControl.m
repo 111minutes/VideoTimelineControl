@@ -84,6 +84,9 @@ typedef enum {
     int _prevEndThumbnailNumber;
     
     NSTimer *_timer;
+    
+    BOOL rightBorderMoved;
+    BOOL leftBorderMoved;
 }
 
 
@@ -251,6 +254,8 @@ typedef enum {
         _rightOverlappedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(width-timelineLeft-5, 0, 0, trimViewHeight)];
         [_rightOverlappedImageView setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:alpha]];
         [_timelineBackgroundImageView addSubview:_rightOverlappedImageView];
+        
+        leftBorderMoved = rightBorderMoved = NO;
     }
     return self;
 }
@@ -424,11 +429,13 @@ typedef enum {
     
     switch (_currentMovingElement) {
         case MovingElementLeftBorder:
+            leftBorderMoved = YES;
             [self processMoveOfLeftTrimPartWithTouch:touch];
             [self checkStartPositionThumbnailChanged];
             _timer = [NSTimer scheduledTimerWithTimeInterval:self.touchedDelayToGenerateNewFrame target:self selector:@selector(timerFireMethodStart:) userInfo:nil repeats:NO];
             break;
         case MovingElementRightBorder:
+            rightBorderMoved = YES;
             [self processMoveOfRightTrimPartWithTouch:touch];
             [self checkEndPositionThumbnailChanged];
             _timer = [NSTimer scheduledTimerWithTimeInterval:self.touchedDelayToGenerateNewFrame target:self selector:@selector(timerFireMethodEnd:) userInfo:nil repeats:NO];
@@ -445,7 +452,7 @@ typedef enum {
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
-
+    
     if (_currentMovingElement != MovingElementSlider) {
         [self setSliderCorrectPosition];
     }
@@ -453,6 +460,11 @@ typedef enum {
     if (!self.sliderHidden) {
         [self checkCurrentThumbnailNumberChanged];
         [_slider setHidden:NO];
+    }
+    
+    if (!leftBorderMoved && !rightBorderMoved && _currentMovingElement != MovingElementSlider) {
+        _currentMovingElement = MovingElementNone;
+        leftBorderMoved = rightBorderMoved = NO;
     }
     
     switch (_currentMovingElement) {
@@ -484,6 +496,7 @@ typedef enum {
     }
     
     _currentMovingElement = MovingElementNone;
+    leftBorderMoved = rightBorderMoved = NO;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
