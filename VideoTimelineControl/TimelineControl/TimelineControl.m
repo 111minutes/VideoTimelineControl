@@ -650,7 +650,7 @@ typedef enum {
             int left =  CGRectGetMinX(_trimTimelineView.frame) + (timelineLeft - trimViewLeft) - sliderWidth/2;
             [_slider setFrame:CGRectMake(MAX(left, sliderFrame.origin.x + r) , sliderFrame.origin.y, sliderWidth, sliderHeight)];
         }
-        else {
+        else if (r < 0){ // esle was here and caused slider to jump to the end during rotation of the device (when r == 0)
             r = CGRectGetMaxX(frame)-_slider.center.x;
             [_slider setFrame:CGRectOffset(_slider.frame, r, 0)];
         }
