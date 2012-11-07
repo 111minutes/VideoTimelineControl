@@ -149,15 +149,6 @@ typedef enum {
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileUrl imagesDictionary:(NSDictionary*)imagesDictionary{
     self = [self initWithFrame:frame imagesDictionary:imagesDictionary];
     if (self) {
-        
-        _fileURL = fileUrl; 
-        _asset = [[AVURLAsset alloc] initWithURL:_fileURL options:nil];
-        _generator = [[AVAssetImageGenerator alloc] initWithAsset:_asset];
-        [_generator setAppliesPreferredTrackTransform:YES];
-
-        _secondGenerator = [[AVAssetImageGenerator alloc] initWithAsset:_asset];
-        [_secondGenerator setAppliesPreferredTrackTransform:YES];
-        
         self.editing = NO;
         self.sliderHidden = NO;
 
@@ -166,12 +157,7 @@ typedef enum {
         _prevEndThumbnailNumber = 0;
         _touchedDelayToGenerateNewFrame = NSIntegerMax;
         
-        _timelineThumbnailsPortrait = [NSMutableArray new];
-        _timelineThumbnailsLandscape = [NSMutableArray new];
-        
-        [self reloadTimelineInCurrentInterfaceOrientation];
-        NSInteger framesCount = _isLastOrientationPortrait ? numberThumbnailsPortrait : numberThumbnailsLandscape;
-        _prevEndThumbnailNumber = framesCount - 1;
+        [self setFileUrl:fileUrl];
     }
     return self;
 }
@@ -202,7 +188,7 @@ typedef enum {
         NSInteger width = CGRectGetWidth(self.frame);
         NSInteger height = CGRectGetHeight(self.frame);
         
-        // backgroun view
+        // background view
         _backgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height - 3)];
         [_backgroundImageView setImage:[UIImage imageNamed:@"edit-timeline-background"]];
         [_backgroundImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
@@ -284,6 +270,30 @@ typedef enum {
     
 }
 
+- (void)setFileUrl:(NSURL *)aFileURL 
+{
+    NSArray *subviews = _timelineBackgroundImageView.subviews;
+    for (UIImageView *imageView in subviews) {
+        [imageView removeFromSuperview];
+    }
+    
+    _fileURL = aFileURL;
+    
+    _asset = [[AVURLAsset alloc] initWithURL:_fileURL options:nil];
+    _generator = [[AVAssetImageGenerator alloc] initWithAsset:_asset];
+    [_generator setAppliesPreferredTrackTransform:YES];
+    
+    _secondGenerator = [[AVAssetImageGenerator alloc] initWithAsset:_asset];
+    [_secondGenerator setAppliesPreferredTrackTransform:YES];
+    
+    _timelineThumbnailsPortrait = [NSMutableArray new];
+    _timelineThumbnailsLandscape = [NSMutableArray new];
+    
+    [self reloadTimelineInCurrentInterfaceOrientation];
+    NSInteger framesCount = _isLastOrientationPortrait ? numberThumbnailsPortrait : numberThumbnailsLandscape;
+    _prevEndThumbnailNumber = framesCount - 1;
+}
+
 #pragma mark Generate Thumbnails
 
 - (void) reloadTimelineInCurrentInterfaceOrientation {
@@ -299,7 +309,6 @@ typedef enum {
     
     for (int i = 0; i < framesCount; i++) {
         UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(i*width, 0, width, timelineHeight)];
-        [thumbnailImageView setBackgroundColor:[UIColor clearColor]];
         [thumbnailImageView setTag:i + 100];
         [_timelineBackgroundImageView addSubview:thumbnailImageView];
     }
@@ -309,7 +318,6 @@ typedef enum {
     [_timelineBackgroundImageView insertSubview:_leftOverlappedImageView atIndex:100];
     [_timelineBackgroundImageView insertSubview:_rightOverlappedImageView atIndex:100];
     
-    [self showAlreadyLoadedImages];
     NSInteger start = _isLastOrientationPortrait ? _timelineThumbnailsPortrait.count : _timelineThumbnailsLandscape.count;
     [self generateThumbnails:framesCount start:start];
     
@@ -325,26 +333,21 @@ typedef enum {
     float delta = assetDuration.value;
     delta /= (assetDuration.timescale * count);
 
-        NSMutableArray *times = [NSMutableArray new];
-        for (int i = start; i < count; i++) {
-            CMTime start = CMTimeMake(assetDuration.timescale*i*delta, assetDuration.timescale);
-            [times addObject:[NSValue valueWithCMTime:start]];
+    NSMutableArray *times = [NSMutableArray new];
+    for (int i = start; i < count; i++) {
+        CMTime start = CMTimeMake(assetDuration.timescale*i*delta, assetDuration.timescale);
+        [times addObject:[NSValue valueWithCMTime:start]];
+    }
+
+    _generator.maximumSize = CGSizeMake(self.frame.size.height, self.frame.size.height);
+    
+    [_generator generateCGImagesAsynchronouslyForTimes:times completionHandler:^(CMTime requestedTime, CGImageRef image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error) {
+        
+        @autoreleasepool {
+            UIImage *thumbnail = [[UIImage alloc] initWithCGImage:image]; //scale:1.0 orientation:UIImageOrientationRight];
+            [self performSelectorOnMainThread:@selector(processNextExtractedImage:) withObject:thumbnail waitUntilDone:YES];
         }
-        [_generator generateCGImagesAsynchronouslyForTimes:times completionHandler:^(CMTime requestedTime, CGImageRef image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error) {
-            
-            @autoreleasepool {
-                NSInteger imageWidth = CGImageGetWidth(image);
-                NSInteger imageHeight = CGImageGetHeight(image);
-                NSInteger newWidth = [self thumbnailImageViewWidthInCurrentOrientation] * 2;
-            
-                NSInteger newHeight = newWidth*imageHeight/imageWidth;
-                CGImageRef newImage = [self resizeCGImage:image toWidth:newWidth andHeight:newHeight];
-                UIImage *thumbnail = [[UIImage alloc] initWithCGImage:newImage]; //scale:1.0 orientation:UIImageOrientationRight];
-                [self performSelectorOnMainThread:@selector(processNextExtractedImage:) withObject:thumbnail waitUntilDone:YES];
-            //        [self processNextExtractedImage:thumbnail];
-                CGImageRelease(newImage);
-            }
-        }];
+    }];
 }
 
 - (CGImageRef)resizeCGImage:(CGImageRef)image toWidth:(int)width andHeight:(int)height {

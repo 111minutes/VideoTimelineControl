@@ -19,7 +19,9 @@
 
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileUrl imagesDictionary:(NSDictionary*)imagesDictionary;
 - (id)initWithFrame:(CGRect)frame imagesDictionary:(NSDictionary*)imagesDictionary;
-- (void)reloadTimelineInCurrentInterfaceOrientation;        //must be call inside didRotateFromInterfaceOrientation 
+- (void)reloadTimelineInCurrentInterfaceOrientation;        //must be call inside didRotateFromInterfaceOrientation
+
+- (void)setFileUrl:(NSURL *)aFileURL;
 
 - (CMTime)timelineSliderTime;     // slider time
 - (CMTime)timelineStartTime;    // start time
