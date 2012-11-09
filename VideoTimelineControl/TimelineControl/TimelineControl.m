@@ -345,7 +345,9 @@ typedef enum {
         
         @autoreleasepool {
             UIImage *thumbnail = [[UIImage alloc] initWithCGImage:image]; //scale:1.0 orientation:UIImageOrientationRight];
-            [self performSelectorOnMainThread:@selector(processNextExtractedImage:) withObject:thumbnail waitUntilDone:YES];
+            [self performSelectorOnMainThread:@selector(processNextExtractedImage:)
+                                   withObject:thumbnail
+                                waitUntilDone:NO];
         }
     }];
 }
