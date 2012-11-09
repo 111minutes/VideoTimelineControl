@@ -15,6 +15,10 @@
 
 @optional
 
+//touches receiving
+- (void) timelineControl:(TimelineControl *)control didReceiveTouch:(UITouch*)touch;
+- (void) timelineControl:(TimelineControl *)control didEndTouch:(UITouch*)touch;
+
 //moved
 - (void) timelineControl:(TimelineControl *)control sliderMoved:(CMTime)time;
 - (void) timelineControl:(TimelineControl *)control sliderTapped:(CMTime)time;
