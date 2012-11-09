@@ -421,6 +421,11 @@ typedef enum {
     [super touchesBegan:touches withEvent:event];
     
     UITouch *touch = [touches anyObject];
+    
+    if ([delegate respondsToSelector:@selector(timelineControl:didReceiveTouch:)]) {
+        [delegate timelineControl:self didReceiveTouch:touch];
+    }
+    
     [self determineCurrentMovingElementWithTouch:touch];
 }
 
@@ -502,6 +507,11 @@ typedef enum {
     
     _currentMovingElement = MovingElementNone;
     leftBorderMoved = rightBorderMoved = NO;
+    
+    if ([delegate respondsToSelector:@selector(timelineControl:didEndTouch:)]) {
+        UITouch *touch = [touches anyObject];
+        [delegate timelineControl:self didEndTouch:touch];
+    }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
