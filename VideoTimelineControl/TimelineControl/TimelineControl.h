@@ -55,4 +55,6 @@
 @property (nonatomic, assign) id<TimelineControlDelegate> delegate;
 @property (nonatomic, assign) NSTimeInterval touchedDelayToGenerateNewFrame;   //default NSIntegerMax, recomended 0.3
 
+- (void)setFileUrl:(NSURL *)aFileURL;
+
 @end
